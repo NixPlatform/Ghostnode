@@ -5,7 +5,7 @@ CONFIG_FILE='nix.conf'
 CONFIGFOLDER='/root/.nix'
 COIN_DAEMON='/usr/local/bin/nixd'
 COIN_CLI='/usr/local/bin/nix-cli'
-COIN_REPO='https://github.com/cryptosharks131/Ghostnode/releases/download/v1.0.0/Nix.tar.gz'
+COIN_REPO='https://github.com/cryptosharks131/Ghostnode/releases/download/v2.0.0/Nix.tar.gz'
 COIN_NAME='NIX'
 COIN_RPC=8332
 COIN_PORT=6214
@@ -94,7 +94,7 @@ EOF
 }
 
 function create_key() {
-  echo -e "Enter your ${RED}$COIN_NAME Ghostnode Private Key${NC}. Leave it blank to generate a new ${RED}Ghostnode Private Key${NC} for you:"
+  echo -e "Enter your ${RED}$COIN_NAME Ghostnode GenKey${NC}. Leave it blank to generate a new ${RED}Ghostnode GenKey${NC} for you:"
   read -e COINKEY
   if [[ -z "$COINKEY" ]]; then
   $COIN_DAEMON -daemon
@@ -106,7 +106,7 @@ function create_key() {
   COINKEY=$($COIN_CLI ghostnode genkey)
   if [ "$?" -gt "0" ];
     then
-    echo -e "${RED}Wallet not fully loaded. Let us wait and try again to generate the Private Key${NC}"
+    echo -e "${RED}Wallet not fully loaded. Let us wait and try again to generate the GenKey${NC}"
     sleep 30
     COINKEY=$($COIN_CLI ghostnode genkey)
   fi
@@ -134,6 +134,9 @@ function enable_firewall() {
   ufw limit ssh/tcp >/dev/null 2>&1
   ufw default allow outgoing >/dev/null 2>&1
   echo "y" | ufw enable >/dev/null 2>&1
+  apt-get -y install fail2ban >/dev/null 2>&1
+  systemctl enable fail2ban >/dev/null 2>&1
+  systemctl start fail2ban >/dev/null 2>&1
 }
 
 
@@ -227,7 +230,7 @@ function important_information() {
  echo -e "Start: ${RED}systemctl start $COIN_NAME.service${NC}"
  echo -e "Stop: ${RED}systemctl stop $COIN_NAME.service${NC}"
  echo -e "VPS_IP:PORT ${RED}$NODEIP:$COIN_PORT${NC}"
- echo -e "GHOSTNODE PRIVATEKEY is: ${RED}$COINKEY${NC}"
+ echo -e "GHOSTNODE GENKEY is: ${RED}$COINKEY${NC}"
  if [[ -n $SENTINEL_REPO  ]]; then
   echo -e "${RED}Sentinel${NC} is installed in ${RED}/sentinel${NC}"
   echo -e "Sentinel logs is: ${RED}$CONFIGFOLDER/sentinel.log${NC}"
